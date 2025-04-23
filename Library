@@ -1,1 +1,119 @@
+local Library = {}
+local TweenService = game:GetService("TweenService")
+local player = game.Players.LocalPlayer
 
+function Library:CreateWindow(title)
+	local playerGui = player:WaitForChild("PlayerGui")
+
+	local screenGui = Instance.new("ScreenGui", playerGui)
+	screenGui.Name = "LumeV2"
+	screenGui.ResetOnSpawn = false
+
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0, 600, 0, 350)
+	mainFrame.Position = UDim2.new(0.5, -300, 0.5, -175)
+	mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	mainFrame.BackgroundTransparency = 0.3
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Active = true
+	mainFrame.Draggable = true
+	mainFrame.Parent = screenGui
+
+	Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+	local stroke = Instance.new("UIStroke", mainFrame)
+	stroke.Color = Color3.fromRGB(255, 0, 0)
+	stroke.Thickness = 1
+
+	local titleLabel = Instance.new("TextLabel")
+	titleLabel.Size = UDim2.new(1, -20, 0, 40)
+	titleLabel.Position = UDim2.new(0, 10, 0, 0)
+	titleLabel.BackgroundTransparency = 1
+	titleLabel.Text = title or "Lume UI"
+	titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	titleLabel.Font = Enum.Font.GothamBold
+	titleLabel.TextSize = 22
+	titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+	titleLabel.Parent = mainFrame
+
+	local tabList = Instance.new("Frame")
+	tabList.Name = "TabList"
+	tabList.Size = UDim2.new(0, 120, 1, -40)
+	tabList.Position = UDim2.new(0, 10, 0, 50)
+	tabList.BackgroundTransparency = 1
+	tabList.Parent = mainFrame
+
+	local tabLayout = Instance.new("UIListLayout", tabList)
+	tabLayout.Padding = UDim.new(0, 6)
+	tabLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+	local contentFrame = Instance.new("Frame")
+	contentFrame.Name = "ContentFrame"
+	contentFrame.Position = UDim2.new(0, 140, 0, 50)
+	contentFrame.Size = UDim2.new(1, -150, 1, -60)
+	contentFrame.BackgroundTransparency = 1
+	contentFrame.Parent = mainFrame
+
+	local currentTab
+	local window = {}
+
+	function window:AddTab(tabName)
+		local tab = {}
+
+		local tabBtn = Instance.new("TextButton")
+		tabBtn.Size = UDim2.new(1, 0, 0, 40)
+		tabBtn.Text = tabName
+		tabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+		tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		tabBtn.Font = Enum.Font.GothamBold
+		tabBtn.TextSize = 16
+		tabBtn.Parent = tabList
+		Instance.new("UICorner", tabBtn).CornerRadius = UDim.new(0, 10)
+
+		local tabFrame = Instance.new("Frame")
+		tabFrame.Size = UDim2.new(1, 0, 1, 0)
+		tabFrame.BackgroundTransparency = 1
+		tabFrame.Visible = false
+		tabFrame.Parent = contentFrame
+
+		Instance.new("UIListLayout", tabFrame).Padding = UDim.new(0, 8)
+
+		tabBtn.MouseButton1Click:Connect(function()
+			if currentTab then currentTab.Visible = false end
+			tabFrame.Visible = true
+			currentTab = tabFrame
+		end)
+
+		function tab:AddButton(text, callback)
+			local button = Instance.new("TextButton")
+			button.Size = UDim2.new(0, 200, 0, 40)
+			button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+			button.TextColor3 = Color3.fromRGB(255, 255, 255)
+			button.Font = Enum.Font.GothamBold
+			button.TextSize = 14
+			button.Text = text
+			button.TextScaled = true
+			button.Parent = tabFrame
+			Instance.new("UICorner", button).CornerRadius = UDim.new(0, 8)
+			button.MouseButton1Click:Connect(callback)
+		end
+
+		function tab:AddLabel(text)
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.new(0, 200, 0, 30)
+			label.BackgroundTransparency = 1
+			label.Text = text
+			label.TextColor3 = Color3.fromRGB(255, 255, 255)
+			label.Font = Enum.Font.GothamBold
+			label.TextSize = 14
+			label.TextXAlignment = Enum.TextXAlignment.Left
+			label.Parent = tabFrame
+		end
+
+		return tab
+	end
+
+	return window
+end
+
+return Library
