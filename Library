@@ -10,14 +10,14 @@ function Library:CreateWindow(title)
 	screenGui.ResetOnSpawn = false
 
 	local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 600, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-mainFrame.BackgroundTransparency = 0.45
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Parent = screenGui
+       mainFrame.Size = UDim2.new(0, 600, 0, 400)
+       mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+       mainFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+       mainFrame.BackgroundTransparency = 0.45
+       mainFrame.BorderSizePixel = 0
+       mainFrame.Active = true
+       mainFrame.Draggable = true
+       mainFrame.Parent = screenGui
 
 	Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 10)
 
