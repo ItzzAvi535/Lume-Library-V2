@@ -9,3 +9,13 @@ mainTab:AddLabel("Put your text here")
 mainTab:AddButton("Button name here", function()
 	print("Farming started")
 end)
+
+mainTab:AddToggle("Auto Farm", function(state)
+    if state then
+        print("Auto-farming enabled!")
+        -- Add your auto-farming code here
+    else
+        print("Auto-farming disabled!")
+        -- Add your code 
+    end
+end, false)  -- false means the toggle starts disabled
