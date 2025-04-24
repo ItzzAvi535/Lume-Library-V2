@@ -163,10 +163,9 @@ function Library:CreateWindow(title)
 		end
 
 function tab:AddToggle(title, callback, default)
-    text = text or "toggle"
-            default = default or false
-            callback = callback or function() end
-
+    local text = title or "Toggle"
+    default = default or false
+    callback = callback or function() end
             local toggleButton = Instance.new("TextButton")
             local toggleLayout = Instance.new("UIListLayout")
             local toggleEdge = Instance.new("Frame")
