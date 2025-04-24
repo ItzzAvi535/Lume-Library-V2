@@ -162,6 +162,59 @@ function Library:CreateWindow(title)
 			label.Parent = tabFrame
 		end
 
+function tab:AddToggle(title, callback, default)
+    -- Create the toggle frame
+    local toggleFrame = Instance.new("Frame")
+    toggleFrame.Size = UDim2.new(0, 180, 0, 30)
+    toggleFrame.Position = UDim2.new(0.5, -90, 0, 0)
+    toggleFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggleFrame.BackgroundTransparency = 0.3
+    toggleFrame.Parent = tabFrame
+
+    -- Create the toggle circle
+    local toggleCircle = Instance.new("ImageLabel")
+    toggleCircle.Size = UDim2.fromOffset(14, 14)
+    toggleCircle.Position = UDim2.new(0, 2, 0.5, 0)
+    toggleCircle.AnchorPoint = Vector2.new(0, 0.5)
+    toggleCircle.Image = "http://www.roblox.com/asset/?id=12266946128"
+    toggleCircle.ImageTransparency = 0.5
+    toggleCircle.Parent = toggleFrame
+
+    -- Create the toggle slider
+    local toggleSlider = Instance.new("Frame")
+    toggleSlider.Size = UDim2.fromOffset(36, 18)
+    toggleSlider.Position = UDim2.new(1, -10, 0.5, 0)
+    toggleSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggleSlider.BackgroundTransparency = 1
+    toggleSlider.Parent = toggleFrame
+
+    -- Add corner radius for smoother look
+    Instance.new("UICorner", toggleSlider).CornerRadius = UDim.new(0, 9)
+
+    -- Initial state of the toggle
+    local isToggled = default or false
+    if isToggled then
+        toggleCircle.Position = UDim2.new(0, 19, 0.5, 0)
+    end
+
+    -- Handle toggling on click
+    toggleFrame.MouseButton1Click:Connect(function()
+        isToggled = not isToggled  -- Flip the state
+        if isToggled then
+            toggleCircle.Position = UDim2.new(0, 19, 0.5, 0)  -- Move the circle to the right
+            toggleSlider.BackgroundTransparency = 0  -- Show the background
+        else
+            toggleCircle.Position = UDim2.new(0, 2, 0.5, 0)  -- Move the circle to the left
+            toggleSlider.BackgroundTransparency = 1  -- Hide the background
+        end
+        
+        -- Call the callback with the new state
+        callback(isToggled)
+    end)
+    
+    return toggleFrame  -- Return the frame if needed for further customization
+end
+
 		tabFrame.Name = tabName
 		return tab
 	end
