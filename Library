@@ -12,7 +12,7 @@ function Library:CreateWindow(title)
 	local mainFrame = Instance.new("Frame")
        mainFrame.Size = UDim2.new(0, 600, 0, 400)
        mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-       mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+       mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
        mainFrame.BackgroundTransparency = 0.10
        mainFrame.BorderSizePixel = 0
        mainFrame.Active = true
