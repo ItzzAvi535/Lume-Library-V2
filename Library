@@ -74,14 +74,6 @@ function library:AddWindow(title, options)
 
         minimizeButton.Text = isMinimized and "+" or "-"
     end)
-
-    -- Return window object or any other elements you'd like to use
-    return {
-        mainFrame = mainFrame,
-        topBar = topBar,
-        minimizeButton = minimizeButton,
-        title = title
-    }
 end
 	return mainFrame
 end
