@@ -1,18 +1,17 @@
 local library = {}
 
--- Function to create a new window
+-- Create a new window
 function library:AddWindow(title, options)
-    local main_color = options.main_color or Color3.fromRGB(41, 74, 122) -- Default color
+    local main_color = options.main_color or Color3.fromRGB(41, 74, 122)
     local min_size = options.min_size or Vector2.new(600, 350)
-    local can_resize = options.can_resize or false
-
+    
     -- Create the main frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, min_size.X, 0, min_size.Y)
     mainFrame.Position = UDim2.new(0.5, -min_size.X/2, 0.5, -min_size.Y/2)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  -- Main frame stays grey
     mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    mainFrame.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui") -- Set to PlayerGui to make it visible
     mainFrame.Active = true
     mainFrame.Draggable = true
 
@@ -40,87 +39,76 @@ function library:AddWindow(title, options)
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
     titleLabel.Parent = topBar
 
-    -- Create a container for tabs
-    local tabsContainer = Instance.new("Frame")
-    tabsContainer.Size = UDim2.new(1, 0, 0, 30)
-    tabsContainer.Position = UDim2.new(0, 0, 0, 30)
-    tabsContainer.BackgroundTransparency = 1
-    tabsContainer.Parent = mainFrame
+    -- Tab system (local to each window)
+    local tabHolder = Instance.new("Frame")
+    tabHolder.Size = UDim2.new(1, 0, 0, 30)
+    tabHolder.Position = UDim2.new(0, 0, 0, 30)
+    tabHolder.BackgroundTransparency = 1
+    tabHolder.Parent = mainFrame
 
-    -- Create content holder for tab content
-    local contentHolder = Instance.new("Frame")
-    contentHolder.Name = "ContentHolder"
-    contentHolder.Size = UDim2.new(1, 0, 1, -60) -- The rest of the space below the tab
-    contentHolder.Position = UDim2.new(0, 0, 0, 60)
-    contentHolder.BackgroundTransparency = 1
-    contentHolder.Parent = mainFrame
+    local tabList = {}  -- This should be local to each window to avoid conflicts with other windows.
 
-    -- Function to add a new tab
-    local tabs = {}
-    function library:AddTab(tabName)
-        -- Create the button for the tab
+    -- AddTab function for each window
+    function library:AddTab(tabTitle)
         local tabButton = Instance.new("TextButton")
         tabButton.Size = UDim2.new(0, 120, 0, 30)
-        tabButton.BackgroundTransparency = 1
-        tabButton.Text = tabName
+        tabButton.Position = UDim2.new(0, #tabList * 120, 0, 0)
+        tabButton.Text = tabTitle
         tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.BackgroundTransparency = 1
         tabButton.Font = Enum.Font.GothamSemibold
         tabButton.TextSize = 14
-        tabButton.Parent = tabsContainer
+        tabButton.TextXAlignment = Enum.TextXAlignment.Center
+        tabButton.Parent = tabHolder
+        
+        table.insert(tabList, tabButton)
 
-        -- Create a frame to hold the tab content
+        -- Create the content frame for each tab
         local tabFrame = Instance.new("Frame")
-        tabFrame.Size = UDim2.new(1, 0, 1, 0)
-        tabFrame.Position = UDim2.new(0, 0, 0, 0)
+        tabFrame.Size = UDim2.new(1, 0, 1, -30)
+        tabFrame.Position = UDim2.new(0, 0, 0, 30)
         tabFrame.BackgroundTransparency = 1
-        tabFrame.Visible = false  -- Initially hidden
-        tabFrame.Parent = contentHolder
+        tabFrame.Visible = false
+        tabFrame.Parent = mainFrame
 
-        -- Create a separator line below the tab
-        local separator = Instance.new("Frame")
-        separator.Size = UDim2.new(1, 0, 0, 1)
-        separator.Position = UDim2.new(0, 0, 1, 0)
-        separator.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-        separator.BorderSizePixel = 0
-        separator.Parent = tabsContainer
-
-        -- Show tab content when clicked
+        -- When the tab is clicked, display the content for that tab
         tabButton.MouseButton1Click:Connect(function()
-            -- Hide all other tab content
-            for _, otherTab in pairs(tabs) do
-                otherTab.tabFrame.Visible = false
+            -- Reset all tab button colors
+            for _, button in ipairs(tabList) do
+                button.TextColor3 = Color3.fromRGB(255, 255, 255)
             end
-            -- Show the selected tab content
+            -- Set the color of the active tab
+            tabButton.TextColor3 = Color3.fromRGB(0, 255, 0)  -- Active tab color
+
+            -- Hide all tab contents and show the selected one
+            for _, frame in ipairs(mainFrame:GetChildren()) do
+                if frame:IsA("Frame") and frame ~= tabFrame then
+                    frame.Visible = false
+                end
+            end
             tabFrame.Visible = true
         end)
 
-        -- Add the tab to the table
-        table.insert(tabs, { tabFrame = tabFrame, button = tabButton })
-
-        return tabFrame
+        -- Return the AddLabel function for this tab
+        return {
+            AddLabel = function(text)
+                local label = Instance.new("TextLabel")
+                label.Size = UDim2.new(0, 180, 0, 30)
+                label.Position = UDim2.new(0.5, -90, 0, 0)
+                label.BackgroundTransparency = 1
+                label.TextColor3 = Color3.fromRGB(255, 255, 255)
+                label.Font = Enum.Font.GothamSemibold
+                label.TextSize = 14
+                label.Text = text
+                label.TextScaled = true
+                label.Parent = tabFrame
+            end
+        }
     end
 
-    -- Function to add label to tab
-    function library:AddLabel(tabFrame, text)
-        local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(0, 180, 0, 30)
-        label.Position = UDim2.new(0.5, -90, 0, 0)
-        label.BackgroundTransparency = 1
-        label.Text = text
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.Font = Enum.Font.GothamSemibold
-        label.TextSize = 14
-        label.TextScaled = true
-        label.Parent = tabFrame
-    end
-
-    -- Return the window object with the function to add tabs and labels
     return {
-        mainFrame = mainFrame,
-        AddTab = library.AddTab,
-        AddLabel = library.AddLabel
+        AddTab = library.AddTab
     }
 end
 
--- Return the full library
 return library
