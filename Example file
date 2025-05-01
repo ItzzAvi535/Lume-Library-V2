@@ -1,11 +1,7 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
 
-local window = library:CreateWindow("Lume library V2")
-
-local mainTab = window:AddTab("Main")
-
-mainTab:AddLabel("Put your text here")
-
-mainTab:AddButton("Button name here", function()
-	print("Farming started")
-end)
+local window = library:AddWindow("Script Name here", {
+	main_color = Color3.fromRGB(41, 74, 122),  -- Set main window color
+	min_size = Vector2.new(600, 350),          -- Set minimum size of the window
+	can_resize = false                          -- Disable resizing
+})
