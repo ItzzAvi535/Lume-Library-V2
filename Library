@@ -1,133 +1,106 @@
 local library = {}
 
-local ui_options = {
-    main_color = Color3.fromRGB(255, 0, 0),
-    min_size = UDim2.new(0, 600, 0, 350),
-    background_color = Color3.fromRGB(0, 0, 0),
-    font = Enum.Font.Gotham,
-}
+-- Internal tables
+library.windows = {}
 
--- Create main window
-local Window = Instance.new("ImageLabel")
-Window.Name = "Window"
-Window.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-Window.Size = ui_options.min_size
-Window.Position = UDim2.new(0.5, -300, 0.5, -175)
-Window.BackgroundColor3 = ui_options.background_color
-Window.BorderSizePixel = 0
-Window.Image = "rbxassetid://6176266590"
-Window.AnchorPoint = Vector2.new(0.5, 0.5)
+-- Create new window
+function library:AddWindow(title, options)
+	local options = options or {}
+	local main_color = options.main_color or Color3.fromRGB(255, 0, 0)
+	local min_size = options.min_size or Vector2.new(600, 350)
+	local can_resize = options.can_resize or false
 
--- Create title bar
-local Title = Instance.new("TextLabel")
-Title.Name = "Title"
-Title.Parent = Window
-Title.Size = UDim2.new(1, 0, 0, 50)
-Title.BackgroundColor3 = ui_options.main_color
-Title.Text = "Lume Library"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = ui_options.font
-Title.TextSize = 24
-Title.TextXAlignment = Enum.TextXAlignment.Center
-Title.TextYAlignment = Enum.TextYAlignment.Center
+	local window = {}
+	window.tabs = {}
 
--- Create tabs container
-local TabsContainer = Instance.new("Frame")
-TabsContainer.Name = "TabsContainer"
-TabsContainer.Parent = Window
-TabsContainer.Size = UDim2.new(1, 0, 0, 50)
-TabsContainer.Position = UDim2.new(0, 0, 0, 50)
-TabsContainer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-TabsContainer.BackgroundTransparency = 0.2
-TabsContainer.BorderSizePixel = 0
+	-- UI setup
+	local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer:WaitForChild("PlayerGui"))
+	ScreenGui.Name = "LumeLibrary"
+	ScreenGui.ResetOnSpawn = false
 
--- Add separator line below the tabs
-local separator = Instance.new("Frame")
-separator.Parent = TabsContainer
-separator.Size = UDim2.new(1, 0, 0, 1)
-separator.Position = UDim2.new(0, 0, 1, 0)
-separator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-separator.BorderSizePixel = 0
+	local Main = Instance.new("Frame", ScreenGui)
+	Main.Name = title
+	Main.Size = UDim2.new(0, min_size.X, 0, min_size.Y)
+	Main.Position = UDim2.new(0.5, -min_size.X/2, 0.5, -min_size.Y/2)
+	Main.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+	Main.BorderSizePixel = 0
+	Main.Active = true
+	Main.Draggable = true
 
--- Create content area below tabs
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Name = "ContentFrame"
-ContentFrame.Parent = Window
-ContentFrame.Position = UDim2.new(0, 0, 0, 100)
-ContentFrame.Size = UDim2.new(1, 0, 1, -100)
-ContentFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-ContentFrame.BackgroundTransparency = 0.3
-ContentFrame.BorderSizePixel = 0
+	local Title = Instance.new("TextLabel", Main)
+	Title.Size = UDim2.new(1, 0, 0, 40)
+	Title.BackgroundColor3 = main_color
+	Title.Text = title
+	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Title.Font = Enum.Font.GothamBold
+	Title.TextSize = 20
 
--- Tabs and content storage
-local tabs = {}
+	local TabsBar = Instance.new("Frame", Main)
+	TabsBar.Size = UDim2.new(0, 100, 1, -40)
+	TabsBar.Position = UDim2.new(0, 0, 0, 40)
+	TabsBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 
--- Function to create a tab and its content
-local function createTab(name, contentText)
-    local tabButton = Instance.new("TextButton")
-    tabButton.Name = name
-    tabButton.Parent = TabsContainer
-    tabButton.Size = UDim2.new(0, 100, 1, 0)
-    tabButton.BackgroundColor3 = ui_options.main_color
-    tabButton.Text = name
-    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tabButton.Font = ui_options.font
-    tabButton.TextSize = 18
-    tabButton.TextXAlignment = Enum.TextXAlignment.Center
-    tabButton.TextYAlignment = Enum.TextYAlignment.Center
+	local ContentArea = Instance.new("Frame", Main)
+	ContentArea.Size = UDim2.new(1, -100, 1, -40)
+	ContentArea.Position = UDim2.new(0, 100, 0, 40)
+	ContentArea.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 
-    local content = Instance.new("Frame")
-    content.Name = name .. "_Content"
-    content.Parent = ContentFrame
-    content.Size = UDim2.new(1, 0, 1, 0)
-    content.BackgroundTransparency = 1
-    content.Visible = false
+	function window:AddTab(tab_name)
+		local tab = {}
+		tab.buttons = {}
 
-    local label = Instance.new("TextLabel")
-    label.Parent = content
-    label.Size = UDim2.new(1, -20, 0, 30)
-    label.Position = UDim2.new(0, 10, 0, 10)
-    label.Text = contentText
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.Font = ui_options.font
-    label.TextSize = 20
-    label.BackgroundTransparency = 1
-    label.TextXAlignment = Enum.TextXAlignment.Left
+		-- Tab button
+		local TabButton = Instance.new("TextButton", TabsBar)
+		TabButton.Size = UDim2.new(1, 0, 0, 40)
+		TabButton.Position = UDim2.new(0, 0, 0, #window.tabs * 40)
+		TabButton.BackgroundColor3 = main_color
+		TabButton.Text = tab_name
+		TabButton.Font = Enum.Font.Gotham
+		TabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+		TabButton.TextSize = 14
 
-    tabs[name] = content
+		-- Tab content frame
+		local TabFrame = Instance.new("ScrollingFrame", ContentArea)
+		TabFrame.Name = tab_name
+		TabFrame.Size = UDim2.new(1, 0, 1, 0)
+		TabFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+		TabFrame.BackgroundTransparency = 1
+		TabFrame.ScrollBarThickness = 4
+		TabFrame.Visible = #window.tabs == 0 -- only first tab is visible
 
-    tabButton.MouseButton1Click:Connect(function()
-        for tabName, tabContent in pairs(tabs) do
-            tabContent.Visible = false
-        end
-        content.Visible = true
-    end)
+		local Layout = Instance.new("UIListLayout", TabFrame)
+		Layout.Padding = UDim.new(0, 6)
+
+		-- Hide other tabs on click
+		TabButton.MouseButton1Click:Connect(function()
+			for _, child in ipairs(ContentArea:GetChildren()) do
+				if child:IsA("Frame") or child:IsA("ScrollingFrame") then
+					child.Visible = false
+				end
+			end
+			TabFrame.Visible = true
+		end)
+
+		function tab:AddButton(text, callback)
+			local btn = Instance.new("TextButton", TabFrame)
+			btn.Size = UDim2.new(1, -10, 0, 30)
+			btn.BackgroundColor3 = main_color
+			btn.Text = text
+			btn.Font = Enum.Font.Gotham
+			btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+			btn.TextSize = 14
+
+			btn.MouseButton1Click:Connect(callback)
+
+			TabFrame.CanvasSize = UDim2.new(0, 0, 0, TabFrame.UIListLayout.AbsoluteContentSize.Y + 10)
+		end
+
+		table.insert(window.tabs, tab)
+		return tab
+	end
+
+	table.insert(library.windows, window)
+	return window
 end
-
--- Create sample tabs
-createTab("Home", "Welcome to the Home tab!")
-createTab("Settings", "Here are your settings.")
-createTab("About", "About this library...")
-
--- Function to add a button (inside a tab or manually)
-function library:AddButton(text, callback)
-    local button = Instance.new("TextButton")
-    button.Parent = ContentFrame
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Position = UDim2.new(0, 50, 0, 60)
-    button.BackgroundColor3 = ui_options.main_color
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = ui_options.font
-    button.TextSize = 18
-    button.TextXAlignment = Enum.TextXAlignment.Center
-    button.TextYAlignment = Enum.TextYAlignment.Center
-
-    button.MouseButton1Click:Connect(callback)
-end
-
--- Default to Home tab on start
-for _, frame in pairs(tabs) do frame.Visible = false end
-if tabs["Home"] then tabs["Home"].Visible = true end
 
 return library
