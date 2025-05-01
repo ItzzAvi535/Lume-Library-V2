@@ -137,17 +137,20 @@ function library:AddTab(window, tabTitle)
 end
 
 function tab:AddLabel(text)
-			local label = Instance.new("TextLabel")
-			label.Size = UDim2.new(0, 180, 0, 30)
-			label.Position = UDim2.new(0.5, -90, 0, 0)
-			label.BackgroundTransparency = 1
-			label.TextColor3 = Color3.fromRGB(255, 255, 255)
-			label.Font = Enum.Font.GothamBold
-			label.TextSize = 14
-			label.Text = text
-			label.TextScaled = true
-			label.Parent = tabFrame
-		end
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamSemibold
+    label.TextSize = 14
+    label.TextScaled = true
+    label.BackgroundTransparency = 1
+
+    -- Auto-sizing the label to fit text
+    label.Size = UDim2.new(0, label.TextBounds.X + 10, 0, label.TextBounds.Y + 10)
+    label.Position = UDim2.new(0.5, -label.TextBounds.X / 2, 0, 0) -- Adjust position to keep it centered
+
+    label.Parent = tabFrame
+end
 
     return {
         mainFrame = mainFrame,
