@@ -1,78 +1,88 @@
 local library = {}
 
--- Initialize the window creation function
-function library:AddWindow(title, options)
-    -- Create the main window
-    local window = Instance.new("Frame")
-    window.Name = title
-    window.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
-    window.Position = UDim2.new(0.5, -options.min_size.X/2, 0.5, -options.min_size.Y/2) -- Center window
-    window.BackgroundColor3 = options.main_color
-    window.BorderSizePixel = 0
-    window.Parent = game.Players.LocalPlayer.PlayerGui
+function library:AddWindow(titleText, options)
+	local player = game:GetService("Players").LocalPlayer
 
-    -- Create a title bar
-    local titleBar = Instance.new("TextLabel")
-    titleBar.Size = UDim2.new(1, 0, 0, 50)
-    titleBar.BackgroundColor3 = options.main_color
-    titleBar.Text = title
-    titleBar.TextColor3 = Color3.fromRGB(255, 255, 255)
-    titleBar.Font = Enum.Font.Gotham
-    titleBar.TextSize = 24
-    titleBar.TextXAlignment = Enum.TextXAlignment.Center
-    titleBar.TextYAlignment = Enum.TextYAlignment.Center
-    titleBar.Parent = window
+	-- Remove old GUI if it exists
+	local existing = game:GetService("CoreGui"):FindFirstChild("lume")
+	if existing then existing:Destroy() end
 
-    -- Tabs container
-    local tabsContainer = Instance.new("Frame")
-    tabsContainer.Size = UDim2.new(1, 0, 0, 50)
-    tabsContainer.Position = UDim2.new(0, 0, 0, 50)
-    tabsContainer.BackgroundTransparency = 0.2
-    tabsContainer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    tabsContainer.BorderSizePixel = 0
-    tabsContainer.Parent = window
+	-- Create ScreenGui
+	local gui = Instance.new("ScreenGui")
+	gui.Name = "lume"
+	gui.Parent = player:WaitForChild("PlayerGui")
 
-    -- Add a separator line below the tabs
-    local separator = Instance.new("Frame")
-    separator.Size = UDim2.new(1, 0, 0, 1)
-    separator.Position = UDim2.new(0, 0, 1, 0)
-    separator.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    separator.BorderSizePixel = 0
-    separator.Parent = tabsContainer
+	-- Main Frame
+	local mainFrame = Instance.new("Frame")
+	mainFrame.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
+	mainFrame.Position = UDim2.new(0.5, -options.min_size.X / 2, 0.5, -options.min_size.Y / 2)
+	mainFrame.BackgroundColor3 = options.main_color or Color3.fromRGB(30, 30, 30)
+	mainFrame.BorderSizePixel = 0
+	mainFrame.Active = true
+	mainFrame.Draggable = true
+	mainFrame.Parent = gui
 
-    return window
-end
+	-- Rounded Corners
+	local corner = Instance.new("UICorner")
+	corner.CornerRadius = UDim.new(0, 10)
+	corner.Parent = mainFrame
 
--- Function to create tabs
-function library:AddTab(window, tabName)
-    local tab = Instance.new("TextButton")
-    tab.Size = UDim2.new(0, 100, 1, 0)
-    tab.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    tab.Text = tabName
-    tab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    tab.Font = Enum.Font.Gotham
-    tab.TextSize = 18
-    tab.Parent = window:FindFirstChild("TabsContainer")
+	-- Top Bar (Color changed to use options.main_color)
+	local topBar = Instance.new("Frame")
+	topBar.Size = UDim2.new(1, 0, 0, 30)
+	topBar.BackgroundColor3 = options.main_color or Color3.fromRGB(255, 0, 0)  -- Use main_color for top bar
+	topBar.BorderSizePixel = 0
+	topBar.Parent = mainFrame
 
-    -- Return tab button for further customization
-    return tab
-end
+	-- Title
+	local title = Instance.new("TextLabel")
+	title.Size = UDim2.new(0, 200, 1, 0)
+	title.Position = UDim2.new(0, 10, 0, 0)
+	title.BackgroundTransparency = 1
+	title.Text = titleText
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.Font = Enum.Font.GothamSemibold
+	title.TextSize = 14
+	title.TextXAlignment = Enum.TextXAlignment.Left
+	title.Parent = topBar
 
--- Function to add buttons to a tab
-function library:AddButton(tab, buttonName, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0, 200, 0, 50)
-    button.Position = UDim2.new(0, 50, 0, 100)
-    button.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
-    button.Text = buttonName
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.Gotham
-    button.TextSize = 18
-    button.TextXAlignment = Enum.TextXAlignment.Center
-    button.TextYAlignment = Enum.TextYAlignment.Center
-    button.Parent = tab.Parent
+	-- Minimize Button
+	local minimizeButton = Instance.new("TextButton")
+	minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+	minimizeButton.Position = UDim2.new(1, -35, 0, 0)
+	minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	minimizeButton.Text = "-"
+	minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+	minimizeButton.Font = Enum.Font.GothamSemibold
+	minimizeButton.TextSize = 18
+	minimizeButton.BorderSizePixel = 0
+	minimizeButton.Parent = topBar
 
-    button.MouseButton1Click:Connect(callback)
+	-- Content Holder
+	local contentHolder = Instance.new("Frame")
+	contentHolder.Name = "ContentHolder"
+	contentHolder.Size = UDim2.new(1, 0, 1, -30)
+	contentHolder.Position = UDim2.new(0, 0, 0, 30)
+	contentHolder.BackgroundTransparency = 1
+	contentHolder.Parent = mainFrame
+
+	local TweenService = game:GetService("TweenService")
+	local isMinimized = false
+
+	minimizeButton.MouseButton1Click:Connect(function()
+		isMinimized = not isMinimized
+		contentHolder.Visible = not isMinimized
+
+		local targetSize = isMinimized and UDim2.new(0, options.min_size.X, 0, 30)
+			or UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
+
+		local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
+
+		minimizeButton.Text = isMinimized and "+" or "-"
+	end)
+
+	return mainFrame
 end
 
 return library
