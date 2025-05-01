@@ -46,4 +46,70 @@ function library:AddWindow(title, options)
     tabHolder.BackgroundTransparency = 1
     tabHolder.Parent = mainFrame
 
+    -- Tab list will hold all the created tabs for this window
+    local tabList = {}
+
+    -- AddTab function for each window
+    function library:AddTab(tabTitle)
+        local tabButton = Instance.new("TextButton")
+        tabButton.Size = UDim2.new(0, 120, 0, 30)
+        tabButton.Position = UDim2.new(0, #tabList * 120, 0, 0)
+        tabButton.Text = tabTitle
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.BackgroundTransparency = 1
+        tabButton.Font = Enum.Font.GothamSemibold
+        tabButton.TextSize = 14
+        tabButton.TextXAlignment = Enum.TextXAlignment.Center
+        tabButton.Parent = tabHolder
+        
+        table.insert(tabList, tabButton)
+
+        -- Create the content frame for each tab
+        local tabFrame = Instance.new("Frame")
+        tabFrame.Size = UDim2.new(1, 0, 1, -30)
+        tabFrame.Position = UDim2.new(0, 0, 0, 30)
+        tabFrame.BackgroundTransparency = 1
+        tabFrame.Visible = false
+        tabFrame.Parent = mainFrame
+
+        -- When the tab is clicked, display the content for that tab
+        tabButton.MouseButton1Click:Connect(function()
+            -- Reset all tab button colors
+            for _, button in ipairs(tabList) do
+                button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            end
+            -- Set the color of the active tab
+            tabButton.TextColor3 = Color3.fromRGB(0, 255, 0)  -- Active tab color
+
+            -- Hide all tab contents and show the selected one
+            for _, frame in ipairs(mainFrame:GetChildren()) do
+                if frame:IsA("Frame") and frame ~= tabFrame then
+                    frame.Visible = false
+                end
+            end
+            tabFrame.Visible = true
+        end)
+
+        -- Return the AddLabel function for this tab
+        return {
+            AddLabel = function(text)
+                local label = Instance.new("TextLabel")
+                label.Size = UDim2.new(0, 180, 0, 30)
+                label.Position = UDim2.new(0.5, -90, 0, 0)
+                label.BackgroundTransparency = 1
+                label.TextColor3 = Color3.fromRGB(255, 255, 255)
+                label.Font = Enum.Font.GothamSemibold
+                label.TextSize = 14
+                label.Text = text
+                label.TextScaled = true
+                label.Parent = tabFrame
+            end
+        }
+    end
+
+    return {
+        AddTab = library.AddTab
+    }
+end
+
 return library
