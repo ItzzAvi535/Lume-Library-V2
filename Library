@@ -81,7 +81,74 @@ function library:AddWindow(titleText, options)
         minimizeButton.Text = isMinimized and "+" or "-"
     end)
 
-    -- Return window object or any other elements you'd like to use
+-- Function to add a new tab to the window
+function library:AddTab(window, tabTitle)
+    -- Create the tab container if it doesn't exist
+    if not window.tabContainer then
+        window.tabContainer = Instance.new("Frame")
+        window.tabContainer.Size = UDim2.new(1, 0, 0, 30) -- Tab height
+        window.tabContainer.Position = UDim2.new(0, 0, 0, 30) -- Just below the top bar
+        window.tabContainer.BackgroundTransparency = 1
+        window.tabContainer.Parent = window.mainFrame
+    end
+
+    -- Create a new tab button
+    local tabButton = Instance.new("TextButton")
+    tabButton.Size = UDim2.new(0, 100, 1, 0)  -- Set the size of the tab button
+    tabButton.Text = tabTitle  -- Set the tab's title
+    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Set text color
+    tabButton.BackgroundTransparency = 1  -- No background for the tab
+    tabButton.Font = Enum.Font.GothamSemibold
+    tabButton.TextSize = 14
+    tabButton.TextXAlignment = Enum.TextXAlignment.Left
+    tabButton.Parent = window.tabContainer
+
+    -- Create a line below the tabs
+    local separatorLine = Instance.new("Frame")
+    separatorLine.Size = UDim2.new(1, 0, 0, 1)
+    separatorLine.Position = UDim2.new(0, 0, 1, 0)
+    separatorLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    separatorLine.BorderSizePixel = 0
+    separatorLine.Parent = window.tabContainer
+
+    -- Create the content for this tab (empty frame for now)
+    local tabContent = Instance.new("Frame")
+    tabContent.Size = UDim2.new(1, 0, 1, -60)  -- Adjust content size
+    tabContent.Position = UDim2.new(0, 0, 0, 60)  -- Below the tab container
+    tabContent.BackgroundTransparency = 1  -- Transparent for now
+    tabContent.Parent = window.mainFrame
+
+    -- Store the tab content in a dictionary for later access
+    window.tabs = window.tabs or {}
+    window.tabs[tabTitle] = tabContent
+
+    -- Function to switch between tabs (show the corresponding tab content)
+    tabButton.MouseButton1Click:Connect(function()
+        -- Hide all tab content first
+        for _, content in pairs(window.tabs) do
+            content.Visible = false
+        end
+        -- Show the selected tab content
+        tabContent.Visible = true
+    end)
+
+    -- Return the tab content so it can be customized later if needed
+    return tabContent
+end
+
+function tab:AddLabel(text)
+			local label = Instance.new("TextLabel")
+			label.Size = UDim2.new(0, 180, 0, 30)
+			label.Position = UDim2.new(0.5, -90, 0, 0)
+			label.BackgroundTransparency = 1
+			label.TextColor3 = Color3.fromRGB(255, 255, 255)
+			label.Font = Enum.Font.GothamBold
+			label.TextSize = 14
+			label.Text = text
+			label.TextScaled = true
+			label.Parent = tabFrame
+		end
+
     return {
         mainFrame = mainFrame,
         topBar = topBar,
