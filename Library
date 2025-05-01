@@ -1,9 +1,15 @@
 local library = {}
 
-function library:AddWindow(title, options)
+function library:AddWindow(titleText, options)
     local main_color = options.main_color or Color3.fromRGB(41, 74, 122) -- Default color for the top bar and minimize button
     local min_size = options.min_size or Vector2.new(600, 350)
-    
+    local can_resize = options.can_resize or false
+
+    -- Create the GUI container
+    local player = game:GetService("Players").LocalPlayer
+    local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    gui.Name = "lume"
+
     -- Create the main frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, min_size.X, 0, min_size.Y)
@@ -31,7 +37,7 @@ function library:AddWindow(title, options)
     title.Size = UDim2.new(0, 200, 1, 0)
     title.Position = UDim2.new(0, 10, 0, 0)
     title.BackgroundTransparency = 1
-    title.Text = title
+    title.Text = titleText  -- Use the titleText argument
     title.TextColor3 = Color3.fromRGB(255, 255, 255)
     title.Font = Enum.Font.GothamSemibold
     title.TextSize = 14
@@ -82,8 +88,6 @@ function library:AddWindow(title, options)
         minimizeButton = minimizeButton,
         title = title
     }
-end
-	return mainFrame
 end
 
 return library
