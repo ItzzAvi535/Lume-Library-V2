@@ -5,3 +5,7 @@ local window = library:AddWindow("Script Name here", {
 	min_size = Vector2.new(600, 350),          -- Set minimum size of the window
 	can_resize = false                          -- Disable resizing
 })
+
+local tab = window:AddTab("Tab 1")
+
+tab:AddLabel("This is a label")
