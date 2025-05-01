@@ -1,22 +1,18 @@
 local library = {}
 
-function library:AddWindow(titleText, options)
-    local main_color = options.main_color or Color3.fromRGB(41, 74, 122) -- Default color for the top bar and minimize button
+-- Function to create a new window
+function library:AddWindow(title, options)
+    local main_color = options.main_color or Color3.fromRGB(41, 74, 122) -- Default color
     local min_size = options.min_size or Vector2.new(600, 350)
     local can_resize = options.can_resize or false
-
-    -- Create the GUI container
-    local player = game:GetService("Players").LocalPlayer
-    local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-    gui.Name = "lume"
 
     -- Create the main frame
     local mainFrame = Instance.new("Frame")
     mainFrame.Size = UDim2.new(0, min_size.X, 0, min_size.Y)
     mainFrame.Position = UDim2.new(0.5, -min_size.X/2, 0.5, -min_size.Y/2)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  -- Main frame stays grey (unchanged)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = gui
+    mainFrame.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
     mainFrame.Active = true
     mainFrame.Draggable = true
 
@@ -28,136 +24,103 @@ function library:AddWindow(titleText, options)
     -- Create the top bar
     local topBar = Instance.new("Frame")
     topBar.Size = UDim2.new(1, 0, 0, 30)
-    topBar.BackgroundColor3 = main_color  -- Top bar color matches main_color
+    topBar.BackgroundColor3 = main_color
     topBar.BorderSizePixel = 0
     topBar.Parent = mainFrame
 
     -- Create the title label
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(0, 200, 1, 0)
-    title.Position = UDim2.new(0, 10, 0, 0)
-    title.BackgroundTransparency = 1
-    title.Text = titleText  -- Use the titleText argument
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
-    title.Font = Enum.Font.GothamSemibold
-    title.TextSize = 14
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = topBar
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(0, 200, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = title
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.GothamSemibold
+    titleLabel.TextSize = 14
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = topBar
 
-    -- Create the minimize button
-    local minimizeButton = Instance.new("TextButton")
-    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-    minimizeButton.Position = UDim2.new(1, -35, 0, 0)
-    minimizeButton.BackgroundColor3 = main_color  -- Minimize button color also changes to match top bar
-    minimizeButton.Text = "-"
-    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    minimizeButton.Font = Enum.Font.GothamSemibold
-    minimizeButton.TextSize = 18
-    minimizeButton.BorderSizePixel = 0
-    minimizeButton.Parent = topBar
+    -- Create a container for tabs
+    local tabsContainer = Instance.new("Frame")
+    tabsContainer.Size = UDim2.new(1, 0, 0, 30)
+    tabsContainer.Position = UDim2.new(0, 0, 0, 30)
+    tabsContainer.BackgroundTransparency = 1
+    tabsContainer.Parent = mainFrame
 
-    -- Create the content holder
+    -- Create content holder for tab content
     local contentHolder = Instance.new("Frame")
     contentHolder.Name = "ContentHolder"
-    contentHolder.Size = UDim2.new(1, 0, 1, -30)
-    contentHolder.Position = UDim2.new(0, 0, 0, 30)
+    contentHolder.Size = UDim2.new(1, 0, 1, -60) -- The rest of the space below the tab
+    contentHolder.Position = UDim2.new(0, 0, 0, 60)
     contentHolder.BackgroundTransparency = 1
     contentHolder.Parent = mainFrame
 
-    -- TweenService setup (optional if you want animations)
-    local TweenService = game:GetService("TweenService")
-    local isMinimized = false
+    -- Function to add a new tab
+    local tabs = {}
+    function library:AddTab(tabName)
+        -- Create the button for the tab
+        local tabButton = Instance.new("TextButton")
+        tabButton.Size = UDim2.new(0, 120, 0, 30)
+        tabButton.BackgroundTransparency = 1
+        tabButton.Text = tabName
+        tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabButton.Font = Enum.Font.GothamSemibold
+        tabButton.TextSize = 14
+        tabButton.Parent = tabsContainer
 
-    -- Minimize button functionality
-    minimizeButton.MouseButton1Click:Connect(function()
-        isMinimized = not isMinimized
-        contentHolder.Visible = not isMinimized
+        -- Create a frame to hold the tab content
+        local tabFrame = Instance.new("Frame")
+        tabFrame.Size = UDim2.new(1, 0, 1, 0)
+        tabFrame.Position = UDim2.new(0, 0, 0, 0)
+        tabFrame.BackgroundTransparency = 1
+        tabFrame.Visible = false  -- Initially hidden
+        tabFrame.Parent = contentHolder
 
-        local targetSize = isMinimized and UDim2.new(0, 600, 0, 30) or UDim2.new(0, 600, 0, 350)
-        local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        -- Create a separator line below the tab
+        local separator = Instance.new("Frame")
+        separator.Size = UDim2.new(1, 0, 0, 1)
+        separator.Position = UDim2.new(0, 0, 1, 0)
+        separator.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        separator.BorderSizePixel = 0
+        separator.Parent = tabsContainer
 
-        TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
+        -- Show tab content when clicked
+        tabButton.MouseButton1Click:Connect(function()
+            -- Hide all other tab content
+            for _, otherTab in pairs(tabs) do
+                otherTab.tabFrame.Visible = false
+            end
+            -- Show the selected tab content
+            tabFrame.Visible = true
+        end)
 
-        minimizeButton.Text = isMinimized and "+" or "-"
-    end)
+        -- Add the tab to the table
+        table.insert(tabs, { tabFrame = tabFrame, button = tabButton })
 
--- Function to add a new tab to the window
-function library:AddTab(window, tabTitle)
-    -- Create the tab container if it doesn't exist
-    if not window.tabContainer then
-        window.tabContainer = Instance.new("Frame")
-        window.tabContainer.Size = UDim2.new(1, 0, 0, 30) -- Tab height
-        window.tabContainer.Position = UDim2.new(0, 0, 0, 30) -- Just below the top bar
-        window.tabContainer.BackgroundTransparency = 1
-        window.tabContainer.Parent = window.mainFrame
+        return tabFrame
     end
 
-    -- Create a new tab button
-    local tabButton = Instance.new("TextButton")
-    tabButton.Size = UDim2.new(0, 100, 1, 0)  -- Set the size of the tab button
-    tabButton.Text = tabTitle  -- Set the tab's title
-    tabButton.TextColor3 = Color3.fromRGB(255, 255, 255)  -- Set text color
-    tabButton.BackgroundTransparency = 1  -- No background for the tab
-    tabButton.Font = Enum.Font.GothamSemibold
-    tabButton.TextSize = 14
-    tabButton.TextXAlignment = Enum.TextXAlignment.Left
-    tabButton.Parent = window.tabContainer
+    -- Function to add label to tab
+    function library:AddLabel(tabFrame, text)
+        local label = Instance.new("TextLabel")
+        label.Size = UDim2.new(0, 180, 0, 30)
+        label.Position = UDim2.new(0.5, -90, 0, 0)
+        label.BackgroundTransparency = 1
+        label.Text = text
+        label.TextColor3 = Color3.fromRGB(255, 255, 255)
+        label.Font = Enum.Font.GothamSemibold
+        label.TextSize = 14
+        label.TextScaled = true
+        label.Parent = tabFrame
+    end
 
-    -- Create a line below the tabs
-    local separatorLine = Instance.new("Frame")
-    separatorLine.Size = UDim2.new(1, 0, 0, 1)
-    separatorLine.Position = UDim2.new(0, 0, 1, 0)
-    separatorLine.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    separatorLine.BorderSizePixel = 0
-    separatorLine.Parent = window.tabContainer
-
-    -- Create the content for this tab (empty frame for now)
-    local tabContent = Instance.new("Frame")
-    tabContent.Size = UDim2.new(1, 0, 1, -60)  -- Adjust content size
-    tabContent.Position = UDim2.new(0, 0, 0, 60)  -- Below the tab container
-    tabContent.BackgroundTransparency = 1  -- Transparent for now
-    tabContent.Parent = window.mainFrame
-
-    -- Store the tab content in a dictionary for later access
-    window.tabs = window.tabs or {}
-    window.tabs[tabTitle] = tabContent
-
-    -- Function to switch between tabs (show the corresponding tab content)
-    tabButton.MouseButton1Click:Connect(function()
-        -- Hide all tab content first
-        for _, content in pairs(window.tabs) do
-            content.Visible = false
-        end
-        -- Show the selected tab content
-        tabContent.Visible = true
-    end)
-
-    -- Return the tab content so it can be customized later if needed
-    return tabContent
-end
-
-function tab:AddLabel(text)
-    local label = Instance.new("TextLabel")
-    label.Text = text
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.GothamSemibold
-    label.TextSize = 14
-    label.TextScaled = true
-    label.BackgroundTransparency = 1
-
-    -- Auto-sizing the label to fit text
-    label.Size = UDim2.new(0, label.TextBounds.X + 10, 0, label.TextBounds.Y + 10)
-    label.Position = UDim2.new(0.5, -label.TextBounds.X / 2, 0, 0) -- Adjust position to keep it centered
-
-    label.Parent = tabFrame
-end
-
+    -- Return the window object with the function to add tabs and labels
     return {
         mainFrame = mainFrame,
-        topBar = topBar,
-        minimizeButton = minimizeButton,
-        title = title
+        AddTab = library.AddTab,
+        AddLabel = library.AddLabel
     }
 end
 
+-- Return the full library
 return library
