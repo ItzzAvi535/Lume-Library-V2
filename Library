@@ -1,88 +1,93 @@
 local library = {}
 
 function library:AddWindow(titleText, options)
-	local player = game:GetService("Players").LocalPlayer
+    local main_color = options.main_color or Color3.fromRGB(41, 74, 122) -- Default color for the top bar and minimize button
+    local min_size = options.min_size or Vector2.new(600, 350)
+    local can_resize = options.can_resize or false
 
-	-- Remove old GUI if it exists
-	local existing = game:GetService("CoreGui"):FindFirstChild("lume")
-	if existing then existing:Destroy() end
+    -- Create the GUI container
+    local player = game:GetService("Players").LocalPlayer
+    local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    gui.Name = "lume"
 
-	-- Create ScreenGui
-	local gui = Instance.new("ScreenGui")
-	gui.Name = "lume"
-	gui.Parent = player:WaitForChild("PlayerGui")
+    -- Create the main frame
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, min_size.X, 0, min_size.Y)
+    mainFrame.Position = UDim2.new(0.5, -min_size.X/2, 0.5, -min_size.Y/2)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  -- Main frame stays grey (unchanged)
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = gui
+    mainFrame.Active = true
+    mainFrame.Draggable = true
 
-	-- Main Frame
-	local mainFrame = Instance.new("Frame")
-	mainFrame.Size = UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
-	mainFrame.Position = UDim2.new(0.5, -options.min_size.X / 2, 0.5, -options.min_size.Y / 2)
-	mainFrame.BackgroundColor3 = options.main_color or Color3.fromRGB(30, 30, 30)
-	mainFrame.BorderSizePixel = 0
-	mainFrame.Active = true
-	mainFrame.Draggable = true
-	mainFrame.Parent = gui
+    -- UICorner for rounded edges on the main frame
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 10)
+    corner.Parent = mainFrame
 
-	-- Rounded Corners
-	local corner = Instance.new("UICorner")
-	corner.CornerRadius = UDim.new(0, 10)
-	corner.Parent = mainFrame
+    -- Create the top bar
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, 0, 0, 30)
+    topBar.BackgroundColor3 = main_color  -- Top bar color matches main_color
+    topBar.BorderSizePixel = 0
+    topBar.Parent = mainFrame
 
-	-- Top Bar (Color changed to use options.main_color)
-	local topBar = Instance.new("Frame")
-	topBar.Size = UDim2.new(1, 0, 0, 30)
-	topBar.BackgroundColor3 = options.main_color or Color3.fromRGB(255, 0, 0)  -- Use main_color for top bar
-	topBar.BorderSizePixel = 0
-	topBar.Parent = mainFrame
+    -- Create the title label
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(0, 200, 1, 0)
+    title.Position = UDim2.new(0, 10, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = titleText  -- Use the titleText argument
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.Font = Enum.Font.GothamSemibold
+    title.TextSize = 14
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = topBar
 
-	-- Title
-	local title = Instance.new("TextLabel")
-	title.Size = UDim2.new(0, 200, 1, 0)
-	title.Position = UDim2.new(0, 10, 0, 0)
-	title.BackgroundTransparency = 1
-	title.Text = titleText
-	title.TextColor3 = Color3.fromRGB(255, 255, 255)
-	title.Font = Enum.Font.GothamSemibold
-	title.TextSize = 14
-	title.TextXAlignment = Enum.TextXAlignment.Left
-	title.Parent = topBar
+    -- Create the minimize button
+    local minimizeButton = Instance.new("TextButton")
+    minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+    minimizeButton.Position = UDim2.new(1, -35, 0, 0)
+    minimizeButton.BackgroundColor3 = main_color  -- Minimize button color also changes to match top bar
+    minimizeButton.Text = "-"
+    minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    minimizeButton.Font = Enum.Font.GothamSemibold
+    minimizeButton.TextSize = 18
+    minimizeButton.BorderSizePixel = 0
+    minimizeButton.Parent = topBar
 
-	-- Minimize Button
-	local minimizeButton = Instance.new("TextButton")
-	minimizeButton.Size = UDim2.new(0, 30, 0, 30)
-	minimizeButton.Position = UDim2.new(1, -35, 0, 0)
-	minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	minimizeButton.Text = "-"
-	minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	minimizeButton.Font = Enum.Font.GothamSemibold
-	minimizeButton.TextSize = 18
-	minimizeButton.BorderSizePixel = 0
-	minimizeButton.Parent = topBar
+    -- Create the content holder
+    local contentHolder = Instance.new("Frame")
+    contentHolder.Name = "ContentHolder"
+    contentHolder.Size = UDim2.new(1, 0, 1, -30)
+    contentHolder.Position = UDim2.new(0, 0, 0, 30)
+    contentHolder.BackgroundTransparency = 1
+    contentHolder.Parent = mainFrame
 
-	-- Content Holder
-	local contentHolder = Instance.new("Frame")
-	contentHolder.Name = "ContentHolder"
-	contentHolder.Size = UDim2.new(1, 0, 1, -30)
-	contentHolder.Position = UDim2.new(0, 0, 0, 30)
-	contentHolder.BackgroundTransparency = 1
-	contentHolder.Parent = mainFrame
+    -- TweenService setup (optional if you want animations)
+    local TweenService = game:GetService("TweenService")
+    local isMinimized = false
 
-	local TweenService = game:GetService("TweenService")
-	local isMinimized = false
+    -- Minimize button functionality
+    minimizeButton.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        contentHolder.Visible = not isMinimized
 
-	minimizeButton.MouseButton1Click:Connect(function()
-		isMinimized = not isMinimized
-		contentHolder.Visible = not isMinimized
+        local targetSize = isMinimized and UDim2.new(0, 600, 0, 30) or UDim2.new(0, 600, 0, 350)
+        local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-		local targetSize = isMinimized and UDim2.new(0, options.min_size.X, 0, 30)
-			or UDim2.new(0, options.min_size.X, 0, options.min_size.Y)
+        TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
 
-		local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-		TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
+        minimizeButton.Text = isMinimized and "+" or "-"
+    end)
 
-		minimizeButton.Text = isMinimized and "+" or "-"
-	end)
-
-	return mainFrame
+    -- Return window object or any other elements you'd like to use
+    return {
+        mainFrame = mainFrame,
+        topBar = topBar,
+        minimizeButton = minimizeButton,
+        title = title
+    }
 end
 
 return library
