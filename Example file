@@ -5,3 +5,9 @@ local window = library:AddWindow("Script Name here", {
 	min_size = Vector2.new(600, 350),          -- Set minimum size of the window
 	can_resize = false                          -- Disable resizing
 })
+
+library:Notify({
+    Title = "LumeHub Notification",
+    Content = "This is a Notification.",
+    Duration = 4
+})
