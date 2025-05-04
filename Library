@@ -60,7 +60,7 @@ function library:AddWindow(titleText, options)
     local contentHolder = Instance.new("Frame")
     contentHolder.Name = "ContentHolder"
     contentHolder.Size = UDim2.new(1, 0, 1, -30)
-    contentHolder.Position = UDim2.new(0, 0, 0, 32)
+    contentHolder.Position = UDim2.new(0, 0, 0, 30)
     contentHolder.BackgroundTransparency = 1
     contentHolder.Parent = mainFrame
 
@@ -81,24 +81,6 @@ function library:AddWindow(titleText, options)
         minimizeButton.Text = isMinimized and "+" or "-"
     end)
 
-local line = Instance.new("Frame")
-    line.Size = UDim2.new(1, 0, 0, 1)
-    line.Position = UDim2.new(0, 0, 1, -40)  -- Position the line above the bottom elements
-    line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    line.BorderSizePixel = 0
-    line.Parent = mainFrame
-
-    -- Create the Display Name label (bottom left)
-    local displayName = Instance.new("TextLabel")
-    displayName.Size = UDim2.new(0, 200, 0, 30)
-    displayName.Position = UDim2.new(0, 10, 1, -30)  -- Positioned at the bottom left
-    displayName.BackgroundTransparency = 1
-    displayName.Text = "Welcome Lume Library " .. player.DisplayName
-    displayName.TextColor3 = Color3.fromRGB(255, 255, 255)
-    displayName.Font = Enum.Font.GothamSemibold
-    displayName.TextSize = 14
-    displayName.Parent = mainFrame
-
     -- Return window object or any other elements you'd like to use
     return {
         mainFrame = mainFrame,
@@ -106,6 +88,81 @@ local line = Instance.new("Frame")
         minimizeButton = minimizeButton,
         title = title
     }
+end
+
+local notificationYOffset = 0
+
+function library:Notify(config)
+    local title = config.Title or "Notification"
+    local content = config.Content or ""
+    local duration = config.Duration or 3
+
+    local player = game:GetService("Players").LocalPlayer
+    local gui = player:WaitForChild("PlayerGui")
+
+    local screenGui = gui:FindFirstChild("NotifyGui") or Instance.new("ScreenGui")
+    screenGui.Name = "NotifyGui"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = gui
+
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(0, 300, 0, 80)
+    holder.Position = UDim2.new(1, 320, 1, -100 - notificationYOffset)
+    holder.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    holder.BackgroundTransparency = 0.1
+    holder.BorderSizePixel = 0
+    holder.AnchorPoint = Vector2.new(1, 1)
+    holder.Parent = screenGui
+
+    local corner = Instance.new("UICorner", holder)
+    corner.CornerRadius = UDim.new(0, 8)
+
+    local stroke = Instance.new("UIStroke", holder)
+    stroke.Color = Color3.fromRGB(255, 80, 80)
+    stroke.Thickness = 1
+
+    local titleLabel = Instance.new("TextLabel", holder)
+    titleLabel.Text = title
+    titleLabel.Size = UDim2.new(1, -20, 0, 25)
+    titleLabel.Position = UDim2.new(0, 10, 0, 5)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.GothamSemibold
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local contentLabel = Instance.new("TextLabel", holder)
+    contentLabel.Text = content
+    contentLabel.Size = UDim2.new(1, -20, 0, 40)
+    contentLabel.Position = UDim2.new(0, 10, 0, 30)
+    contentLabel.BackgroundTransparency = 1
+    contentLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    contentLabel.Font = Enum.Font.Gotham
+    contentLabel.TextSize = 14
+    contentLabel.TextWrapped = true
+    contentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    contentLabel.TextYAlignment = Enum.TextYAlignment.Top
+
+    local tweenService = game:GetService("TweenService")
+    local inTween = tweenService:Create(holder, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(1, -20, 1, -100 - notificationYOffset)
+    })
+
+    local outTween = tweenService:Create(holder, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, 320, 1, -100 - notificationYOffset)
+    })
+
+    inTween:Play()
+
+    notificationYOffset += 90
+
+    task.delay(duration, function()
+        outTween:Play()
+        outTween.Completed:Wait()
+        holder:Destroy()
+        notificationYOffset -= 90
+    end)
 end
 
 return library
