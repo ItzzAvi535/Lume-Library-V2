@@ -64,81 +64,77 @@ function library:AddWindow(titleText, options)
     contentHolder.BackgroundTransparency = 1
     contentHolder.Parent = mainFrame
 
-    -- Create tab holder
-    local tabList = Instance.new("Frame")
-    tabList.Name = "TabList"
-    tabList.Size = UDim2.new(0, 120, 1, 0)
-    tabList.Position = UDim2.new(0, 0, 0, 0)
-    tabList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    tabList.BorderSizePixel = 0
-    tabList.Parent = contentHolder
+    -- AddTab function inside AddWindow
+    function window:AddTab(name)
+        local tabList = Instance.new("Frame")
+        tabList.Name = "TabList"
+        tabList.Size = UDim2.new(0, 120, 1, 0)
+        tabList.Position = UDim2.new(0, 0, 0, 0)
+        tabList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        tabList.BorderSizePixel = 0
+        tabList.Parent = contentHolder
 
-    -- Create tab content frame
-    local tabContent = Instance.new("Frame")
-    tabContent.Name = "TabContent"
-    tabContent.Size = UDim2.new(1, -120, 1, 0)
-    tabContent.Position = UDim2.new(0, 120, 0, 0)
-    tabContent.BackgroundTransparency = 1
-    tabContent.Parent = contentHolder
+        local tabContent = Instance.new("Frame")
+        tabContent.Name = "TabContent"
+        tabContent.Size = UDim2.new(1, -120, 1, 0)
+        tabContent.Position = UDim2.new(0, 120, 0, 0)
+        tabContent.BackgroundTransparency = 1
+        tabContent.Parent = contentHolder
 
-    -- Tab functionality
-    local UIListLayout = Instance.new("UIListLayout", tabList)
-    UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    UIListLayout.Padding = UDim.new(0, 4)
+        local UIListLayout = Instance.new("UIListLayout", tabList)
+        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        UIListLayout.Padding = UDim.new(0, 4)
 
-    local tabs = {}
+        local tabs = {}
 
-    local function switchTab(selectedTab)
-        for _, tab in ipairs(tabs) do
-            tab.content.Visible = (tab == selectedTab)
-            tab.button.BackgroundColor3 = tab == selectedTab and main_color or Color3.fromRGB(25, 25, 25)
-        end
-    end
-
-    local function AddTab(name)
-        local button = Instance.new("TextButton")
-        button.Size = UDim2.new(1, -10, 0, 30)
-        button.Position = UDim2.new(0, 5, 0, 0)
-        button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        button.BorderSizePixel = 0
-        button.Text = name
-        button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.Font = Enum.Font.Gotham
-        button.TextSize = 14
-        button.Parent = tabList
-
-        local corner = Instance.new("UICorner", button)
-        corner.CornerRadius = UDim.new(0, 6)
-
-        local content = Instance.new("Frame")
-        content.Name = name .. "_Content"
-        content.Size = UDim2.new(1, 0, 1, 0)
-        content.BackgroundTransparency = 1
-        content.Visible = false
-        content.Parent = tabContent
-
-        local tab = {button = button, content = content}
-        table.insert(tabs, tab)
-
-        button.MouseButton1Click:Connect(function()
-            switchTab(tab)
-        end)
-
-        if #tabs == 1 then
-            switchTab(tab)
+        local function switchTab(selectedTab)
+            for _, tab in ipairs(tabs) do
+                tab.content.Visible = (tab == selectedTab)
+                tab.button.BackgroundColor3 = tab == selectedTab and main_color or Color3.fromRGB(25, 25, 25)
+            end
         end
 
-        return content -- Return content holder so user can add UI to it
+        local function AddTab(name)
+            local button = Instance.new("TextButton")
+            button.Size = UDim2.new(1, -10, 0, 30)
+            button.Position = UDim2.new(0, 5, 0, 0)
+            button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            button.BorderSizePixel = 0
+            button.Text = name
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            button.Font = Enum.Font.Gotham
+            button.TextSize = 14
+            button.Parent = tabList
+
+            local corner = Instance.new("UICorner", button)
+            corner.CornerRadius = UDim.new(0, 6)
+
+            local content = Instance.new("Frame")
+            content.Name = name .. "_Content"
+            content.Size = UDim2.new(1, 0, 1, 0)
+            content.BackgroundTransparency = 1
+            content.Visible = false
+            content.Parent = tabContent
+
+            local tab = {button = button, content = content}
+            table.insert(tabs, tab)
+
+            button.MouseButton1Click:Connect(function()
+                switchTab(tab)
+            end)
+
+            if #tabs == 1 then
+                switchTab(tab)
+            end
+
+            return content -- Return content holder so user can add UI to it
+        end
+
+        return AddTab
     end
 
-    -- Return window object or any other elements you'd like to use
-    return {
-        mainFrame = mainFrame,
-        topBar = topBar,
-        minimizeButton = minimizeButton,
-        title = title,
-        AddTab = AddTab
-    }
+    -- return window object including AddTab method
+    return window
 end
 
 return library
