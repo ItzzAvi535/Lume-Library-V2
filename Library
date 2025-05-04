@@ -49,7 +49,7 @@ function library:AddWindow(titleText, options)
     minimizeButton.Size = UDim2.new(0, 30, 0, 30)
     minimizeButton.Position = UDim2.new(1, -35, 0, 0)
     minimizeButton.BackgroundColor3 = main_color  -- Minimize button color also changes to match top bar
-    minimizeButton.Text = "-"
+    minimizeButton.Text = "↑"
     minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     minimizeButton.Font = Enum.Font.GothamSemibold
     minimizeButton.TextSize = 18
@@ -78,7 +78,7 @@ function library:AddWindow(titleText, options)
 
         TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
 
-        minimizeButton.Text = isMinimized and "+" or "-"
+        minimizeButton.Text = isMinimized and "↓" or "↑"
     end)
 
     -- Return window object or any other elements you'd like to use
