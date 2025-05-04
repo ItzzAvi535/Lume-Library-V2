@@ -64,6 +64,50 @@ function library:AddWindow(titleText, options)
     contentHolder.BackgroundTransparency = 1
     contentHolder.Parent = mainFrame
 
+    -- Horizontal line above the user information
+    local line = Instance.new("Frame")
+    line.Size = UDim2.new(1, 0, 0, 1)
+    line.Position = UDim2.new(0, 0, 0, 0)
+    line.BackgroundColor3 = Color3.fromRGB(255, 255, 255)  -- White line
+    line.BorderSizePixel = 0
+    line.Parent = contentHolder
+
+    -- Create a label for "Welcome [DisplayName]"
+    local welcomeLabel = Instance.new("TextLabel")
+    welcomeLabel.Size = UDim2.new(0, 580, 0, 30)
+    welcomeLabel.Position = UDim2.new(0, 10, 0, 10)
+    welcomeLabel.BackgroundTransparency = 1
+    welcomeLabel.Text = "Welcome " .. player.DisplayName
+    welcomeLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    welcomeLabel.Font = Enum.Font.GothamSemibold
+    welcomeLabel.TextSize = 16
+    welcomeLabel.TextXAlignment = Enum.TextXAlignment.Left
+    welcomeLabel.Parent = contentHolder
+
+    -- Create a label for FPS and Ping
+    local statusLabel = Instance.new("TextLabel")
+    statusLabel.Size = UDim2.new(0, 580, 0, 30)
+    statusLabel.Position = UDim2.new(0, 10, 0, 50)
+    statusLabel.BackgroundTransparency = 1
+    statusLabel.Text = "FPS: -- | Ping: --"
+    statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    statusLabel.Font = Enum.Font.GothamSemibold
+    statusLabel.TextSize = 14
+    statusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    statusLabel.Parent = contentHolder
+
+    -- Function to update FPS and Ping
+    local function updateStats()
+        local fps = math.floor(game:GetService("Stats").PerformanceStats.FramesPerSecond)
+        local ping = math.floor(player:GetNetworkPing())
+        statusLabel.Text = "FPS: " .. fps .. " | Ping: " .. ping
+    end
+
+    -- Update FPS and Ping every 1 second
+    game:GetService("RunService").Heartbeat:Connect(function()
+        updateStats()
+    end)
+
     -- TweenService setup (optional if you want animations)
     local TweenService = game:GetService("TweenService")
     local isMinimized = false
