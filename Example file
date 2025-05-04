@@ -11,3 +11,5 @@ library:Notify({
     Content = "This is a Notification.",
     Duration = 4
 })
+
+local tab1 = window:AddTab("Tab 1")
