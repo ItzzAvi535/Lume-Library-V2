@@ -1,15 +1,7 @@
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
 
-local window = library:AddWindow("Script Name here", {
-	main_color = Color3.fromRGB(41, 74, 122),  -- Set main window color
-	min_size = Vector2.new(600, 350),          -- Set minimum size of the window
-	can_resize = false                          -- Disable resizing
+local window = library:AddWindow("Name GUI", {
+	main_color = Color3.fromRGB(41, 74, 122), -- Color
+	min_size = Vector2.new(250, 346), -- Size of the gui
+	can_resize = false, -- true or false
 })
-
-library:Notify({
-    Title = "LumeHub Notification",
-    Content = "This is a Notification.",
-    Duration = 4
-})
-
-local tab1 = window:AddTab("Tab 1")
