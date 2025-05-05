@@ -64,77 +64,105 @@ function library:AddWindow(titleText, options)
     contentHolder.BackgroundTransparency = 1
     contentHolder.Parent = mainFrame
 
-    -- AddTab function inside AddWindow
-    function window:AddTab(name)
-        local tabList = Instance.new("Frame")
-        tabList.Name = "TabList"
-        tabList.Size = UDim2.new(0, 120, 1, 0)
-        tabList.Position = UDim2.new(0, 0, 0, 0)
-        tabList.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-        tabList.BorderSizePixel = 0
-        tabList.Parent = contentHolder
+    -- TweenService setup (optional if you want animations)
+    local TweenService = game:GetService("TweenService")
+    local isMinimized = false
 
-        local tabContent = Instance.new("Frame")
-        tabContent.Name = "TabContent"
-        tabContent.Size = UDim2.new(1, -120, 1, 0)
-        tabContent.Position = UDim2.new(0, 120, 0, 0)
-        tabContent.BackgroundTransparency = 1
-        tabContent.Parent = contentHolder
+    -- Minimize button functionality
+    minimizeButton.MouseButton1Click:Connect(function()
+        isMinimized = not isMinimized
+        contentHolder.Visible = not isMinimized
 
-        local UIListLayout = Instance.new("UIListLayout", tabList)
-        UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        UIListLayout.Padding = UDim.new(0, 4)
+        local targetSize = isMinimized and UDim2.new(0, 600, 0, 30) or UDim2.new(0, 600, 0, 350)
+        local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
-        local tabs = {}
+        TweenService:Create(mainFrame, tweenInfo, {Size = targetSize}):Play()
 
-        local function switchTab(selectedTab)
-            for _, tab in ipairs(tabs) do
-                tab.content.Visible = (tab == selectedTab)
-                tab.button.BackgroundColor3 = tab == selectedTab and main_color or Color3.fromRGB(25, 25, 25)
-            end
-        end
+        minimizeButton.Text = isMinimized and "↓" or "↑"
+    end)
 
-        local function AddTab(name)
-            local button = Instance.new("TextButton")
-            button.Size = UDim2.new(1, -10, 0, 30)
-            button.Position = UDim2.new(0, 5, 0, 0)
-            button.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            button.BorderSizePixel = 0
-            button.Text = name
-            button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            button.Font = Enum.Font.Gotham
-            button.TextSize = 14
-            button.Parent = tabList
+    -- Return window object or any other elements you'd like to use
+    return {
+        mainFrame = mainFrame,
+        topBar = topBar,
+        minimizeButton = minimizeButton,
+        title = title
+    }
+end
 
-            local corner = Instance.new("UICorner", button)
-            corner.CornerRadius = UDim.new(0, 6)
+local notificationYOffset = 0
 
-            local content = Instance.new("Frame")
-            content.Name = name .. "_Content"
-            content.Size = UDim2.new(1, 0, 1, 0)
-            content.BackgroundTransparency = 1
-            content.Visible = false
-            content.Parent = tabContent
+function library:Notify(config)
+    local title = config.Title or "Notification"
+    local content = config.Content or ""
+    local duration = config.Duration or 3
 
-            local tab = {button = button, content = content}
-            table.insert(tabs, tab)
+    local player = game:GetService("Players").LocalPlayer
+    local gui = player:WaitForChild("PlayerGui")
 
-            button.MouseButton1Click:Connect(function()
-                switchTab(tab)
-            end)
+    local screenGui = gui:FindFirstChild("NotifyGui") or Instance.new("ScreenGui")
+    screenGui.Name = "NotifyGui"
+    screenGui.IgnoreGuiInset = true
+    screenGui.ResetOnSpawn = false
+    screenGui.Parent = gui
 
-            if #tabs == 1 then
-                switchTab(tab)
-            end
+    local holder = Instance.new("Frame")
+    holder.Size = UDim2.new(0, 300, 0, 80)
+    holder.Position = UDim2.new(1, 320, 1, -100 - notificationYOffset)
+    holder.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    holder.BackgroundTransparency = 0.1
+    holder.BorderSizePixel = 0
+    holder.AnchorPoint = Vector2.new(1, 1)
+    holder.Parent = screenGui
 
-            return content -- Return content holder so user can add UI to it
-        end
+    local corner = Instance.new("UICorner", holder)
+    corner.CornerRadius = UDim.new(0, 8)
 
-        return AddTab
-    end
+    local stroke = Instance.new("UIStroke", holder)
+    stroke.Color = Color3.fromRGB(255, 80, 80)
+    stroke.Thickness = 1
 
-    -- return window object including AddTab method
-    return window
+    local titleLabel = Instance.new("TextLabel", holder)
+    titleLabel.Text = title
+    titleLabel.Size = UDim2.new(1, -20, 0, 25)
+    titleLabel.Position = UDim2.new(0, 10, 0, 5)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.GothamSemibold
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    local contentLabel = Instance.new("TextLabel", holder)
+    contentLabel.Text = content
+    contentLabel.Size = UDim2.new(1, -20, 0, 40)
+    contentLabel.Position = UDim2.new(0, 10, 0, 30)
+    contentLabel.BackgroundTransparency = 1
+    contentLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+    contentLabel.Font = Enum.Font.Gotham
+    contentLabel.TextSize = 14
+    contentLabel.TextWrapped = true
+    contentLabel.TextXAlignment = Enum.TextXAlignment.Left
+    contentLabel.TextYAlignment = Enum.TextYAlignment.Top
+
+    local tweenService = game:GetService("TweenService")
+    local inTween = tweenService:Create(holder, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        Position = UDim2.new(1, -20, 1, -100 - notificationYOffset)
+    })
+
+    local outTween = tweenService:Create(holder, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
+        Position = UDim2.new(1, 320, 1, -100 - notificationYOffset)
+    })
+
+    inTween:Play()
+
+    notificationYOffset += 90
+
+    task.delay(duration, function()
+        outTween:Play()
+        outTween.Completed:Wait()
+        holder:Destroy()
+        notificationYOffset -= 90
+    end)
 end
 
 return library
