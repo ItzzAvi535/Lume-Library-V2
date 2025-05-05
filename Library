@@ -107,15 +107,38 @@ Window.Name = "Window"
 Window.Parent = Prefabs
 Window.Active = true
 Window.BackgroundColor3 = Color3.new(1, 1, 1)
-Window.BackgroundTransparency = 1
+Window.BackgroundTransparency = 0.2
 Window.ClipsDescendants = true
 Window.Position = UDim2.new(0, 20, 0, 20)
 Window.Selectable = true
-Window.Size = UDim2.new(0, 200, 0, 200)
-Window.Image = "rbxassetid://2851929490"
-Window.ImageColor3 = Color3.new(0.0823529, 0.0862745, 0.0901961)
-Window.ScaleType = Enum.ScaleType.Slice
-Window.SliceCenter = Rect.new(12, 12, 12, 12)
+Window.Size = UDim2.new(0, 300, 0, 200)
+
+local gradient = Instance.new("UIGradient")
+gradient.Parent = Window
+gradient.Color = ColorSequence.new(
+    Color3.fromRGB(35, 35, 35), 
+    Color3.fromRGB(50, 50, 50)
+)
+gradient.Rotation = 45
+
+local border = Instance.new("Frame")
+border.Parent = Window
+border.Size = UDim2.new(1, 0, 1, 0)
+border.Position = UDim2.new(0, 0, 0, 0)
+border.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+border.BorderSizePixel = 3
+
+local UICorner = Instance.new("UICorner")
+UICorner.Parent = Window
+UICorner.CornerRadius = UDim.new(0, 10)
+
+local shadow = Instance.new("Frame")
+shadow.Parent = Window
+shadow.Size = UDim2.new(1, 8, 1, 8)
+shadow.Position = UDim2.new(0, -4, 0, -4)
+shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+shadow.BackgroundTransparency = 0.5
+shadow.ZIndex = Window.ZIndex - 1
 
 Resizer.Name = "Resizer"
 Resizer.Parent = Window
