@@ -1,5 +1,3 @@
-local library = {}
-
 local ui_options = {
 	main_color = Color3.fromRGB(41, 74, 122),
 	min_size = Vector2.new(400, 300),
@@ -86,7 +84,7 @@ local Input_Roundify_4px = Instance.new("ImageLabel")
 local Windows = Instance.new("Frame")
 
 Lume.Name = "Lume"
-Lume.Parent = game:GetService("CoreGui") or gethui()
+Lume.Parent = game:GetService("CoreGui")
 
 Prefabs.Name = "Prefabs"
 Prefabs.Parent = Lume
@@ -95,7 +93,7 @@ Prefabs.Size = UDim2.new(0, 100, 0, 100)
 Prefabs.Visible = false
 
 Label.Name = "Label"
-Label.Name = Prefabs
+Label.Parent = Prefabs
 Label.BackgroundColor3 = Color3.new(1, 1, 1)
 Label.BackgroundTransparency = 1
 Label.Size = UDim2.new(0, 200, 0, 20)
@@ -129,7 +127,7 @@ Resizer.Position = UDim2.new(1, -20, 1, -20)
 Resizer.Size = UDim2.new(0, 20, 0, 20)
 
 Bar.Name = "Bar"
-Bar.Parent = "Window"
+Bar.Parent = Window
 Bar.BackgroundColor3 = Color3.new(0.160784, 0.290196, 0.478431)
 Bar.BorderSizePixel = 0
 Bar.Position = UDim2.new(0, 0, 0, 5)
