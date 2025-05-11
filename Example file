@@ -1,7 +1,35 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
 
-local window = library:AddWindow("Name GUI", {
-	main_color = Color3.fromRGB(41, 74, 122), -- Color
-	min_size = Vector2.new(250, 346), -- Size of the gui
-	can_resize = false, -- true or false
+local Window = Library:CreateWindow({
+    Name = "Script name here",
+    main_color = Color3.fromRGB(41, 74, 122),
+    min_size = Vector2.new(600, 500),
+    KeySystem = false,
+    KeySettings = {
+        Title = "Untitled",
+        Subtitle = "Key System",
+        Note = "No method of obtaining the key is provided",
+        FileName = "Key",
+        SaveKey = true,
+        GrabKeyFromSite = false,
+        Key = {"Hello"}
+    }
+})
+
+local features = Window:AddTab("Tab name here")
+
+features:AddToggle("MyToggle", function(state)
+    if state then
+        print("Toggle On")
+    else
+        print("Toggle Off")
+    end
+end)
+
+features:AddSlider("Slider", {
+    Min = 0,
+    Max = 100,
+    Callback = function(Value)
+        print("Slider was changed:", Value)
+    end
 })
