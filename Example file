@@ -10,15 +10,11 @@ local mainTab = ui:CreateTab("Main")
 -- Add a button
 mainTab:AddButton("Teleport Player", function()
     print("Teleporting player!")
-    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Example teleport
 end)
 
 -- Add a toggle
 mainTab:AddToggle("God Mode", function(state)
     print("God Mode: " .. (state and "Enabled" or "Disabled"))
-    -- Example: Toggle player health
-    game.Players.LocalPlayer.Character.Humanoid.MaxHealth = state and math.huge or 100
-    game.Players.LocalPlayer.Character.Humanoid.Health = state and math.huge or 100
 end)
 
 -- Add a slider
@@ -44,23 +40,6 @@ end)
 -- Add a dropdown
 mainTab:AddDropdown({"Red", "Blue", "Green"}, function(selected)
     print("Selected color: " .. selected)
-    -- Example: Change player color
-    local colorMap = {
-        Red = Color3.fromRGB(255, 0, 0),
-        Blue = Color3.fromRGB(0, 0, 255),
-        Green = Color3.fromRGB(0, 255, 0)
-    }
-    game.Players.LocalPlayer.Character.HumanoidRootPart.BrickColor = BrickColor.new(selected)
 end)
 
--- Create a second tab for additional features
-local settingsTab = ui:CreateTab("Settings")
-
--- Add a button to reset game
-settingsTab:AddButton("Reset Game", function()
-    print("Resetting game!")
-    game.Players.LocalPlayer.Character.Humanoid.Health = 0
-end)
-
--- Add a notification on UI load
 ui:Notify("Welcome to My Custom UI! Press RightShift to toggle visibility.", 5)
