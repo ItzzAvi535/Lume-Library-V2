@@ -1,35 +1,66 @@
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
+-- Load the Lume Library V2 using the loadstring
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
 
-local Window = Library:CreateWindow({
-    Name = "Script name here",
-    main_color = Color3.fromRGB(41, 74, 122),
-    min_size = Vector2.new(600, 500),
-    KeySystem = false,
-    KeySettings = {
-        Title = "Untitled",
-        Subtitle = "Key System",
-        Note = "No method of obtaining the key is provided",
-        FileName = "Key",
-        SaveKey = true,
-        GrabKeyFromSite = false,
-        Key = {"Hello"}
-    }
-})
+-- Create the UI with a custom title
+local ui = library:CreateUI("My Custom UI")
 
-local features = Window:AddTab("Tab name here")
+-- Create a "Main" tab
+local mainTab = ui:CreateTab("Main")
 
-features:AddToggle("MyToggle", function(state)
-    if state then
-        print("Toggle On")
-    else
-        print("Toggle Off")
+-- Add a button
+mainTab:AddButton("Teleport Player", function()
+    print("Teleporting player!")
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(0, 50, 0) -- Example teleport
+end)
+
+-- Add a toggle
+mainTab:AddToggle("God Mode", function(state)
+    print("God Mode: " .. (state and "Enabled" or "Disabled"))
+    -- Example: Toggle player health
+    game.Players.LocalPlayer.Character.Humanoid.MaxHealth = state and math.huge or 100
+    game.Players.LocalPlayer.Character.Humanoid.Health = state and math.huge or 100
+end)
+
+-- Add a slider
+mainTab:AddSlider(1, 100, 50, function(value)
+    print("Walk Speed: " .. value)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+end)
+
+-- Add a textbox
+mainTab:AddTextbox("Enter Message...", function(input)
+    print("Message: " .. input)
+    ui:Notify("You entered: " .. input, 3)
+end)
+
+-- Add a keybind
+mainTab:AddKeybind("Jump Key", function(key)
+    print("Jump key set or pressed: " .. key.Name)
+    if key then
+        game.Players.LocalPlayer.Character.Humanoid.Jump = true
     end
 end)
 
-features:AddSlider("Slider", {
-    Min = 0,
-    Max = 100,
-    Callback = function(Value)
-        print("Slider was changed:", Value)
-    end
-})
+-- Add a dropdown
+mainTab:AddDropdown({"Red", "Blue", "Green"}, function(selected)
+    print("Selected color: " .. selected)
+    -- Example: Change player color
+    local colorMap = {
+        Red = Color3.fromRGB(255, 0, 0),
+        Blue = Color3.fromRGB(0, 0, 255),
+        Green = Color3.fromRGB(0, 255, 0)
+    }
+    game.Players.LocalPlayer.Character.HumanoidRootPart.BrickColor = BrickColor.new(selected)
+end)
+
+-- Create a second tab for additional features
+local settingsTab = ui:CreateTab("Settings")
+
+-- Add a button to reset game
+settingsTab:AddButton("Reset Game", function()
+    print("Resetting game!")
+    game.Players.LocalPlayer.Character.Humanoid.Health = 0
+end)
+
+-- Add a notification on UI load
+ui:Notify("Welcome to My Custom UI! Press RightShift to toggle visibility.", 5)
