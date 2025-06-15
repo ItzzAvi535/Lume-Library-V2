@@ -4,80 +4,59 @@ Loadstring
 ```lua
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
 ```
-
+Create Window:
+```lua
+local window = library:AddWindow("My Awesome Script", {
+    main_color = Color3.fromRGB(41, 74, 122),
+    main_size = Vector2.new(600, 340),
+    Key_system = true, -- Set to false to disable key system
+    Key = "Avi"
+})
+```
 
 AddLabel:
 ```lua
-features:AddLabel("Hello World!")
+Main:AddLabel("This is a test label")
 ```
 
 AddTab:
 ```lua
-local features = window:AddTab("Features") -- Name of tab
-features:Show() -- shows the tab
+local Main = window:AddTab("Main")
 ```
 AddButton:
 ```lua
-features:AddButton("name",function()
-	-- Code here
+Main:AddButton("Test Button", function()
+    -- your code here
 end)
 ```
 AddToggle:
 ```lua
-local switch = features:AddSwitch("name", function(bool)
-	 -- toggle_god_mode(bool)
+local Toggle = Main:AddToggle("Test Toggle", function(state)
+    print("Toggle state:", state)
 end)
-switch:Set(true)
 ```
 AddTextBox:
 ```lua
-features:AddTextBox("free click", function(text) -- u can add any text to "text"
-	game:GetService("ReplicatedStorage").Events.FreeGifts.Gift2:FireServer(text,"Clicks",false,false,"Normal")
+Main:AddTextBox("Test Textbox", function(text)
+    print("Text entered:", text)
 end)
 ```
 AddSlider:
 ```lua
-local slider = features:AddSlider("WalkSpeed", function(p)
-	setwalkspeed(p)   
-end, {                    
-
-	["min"] = 16,
-	["max"] = 100,  
+local slider = Main:AddSlider("Test Slider", function(value)
+    print("Slider value:", value)
+end, {
+    min = 16,
+    max = 100
 })
-slider:Set(16) -- Needed
+slider:Set(16)
 ```
 AddDropdown:
 ```lua
-local dropdown = features:AddDropdown("select", function(text)
-	if text == "Mars" then  -- Code
-		print("o")
-	elseif text == "Earth" then
-	print("k")
-	elseif text == "Iridocyclitis" then
-	print("Weeeee")
-	end
+local dropdown = Main:AddDropdown("Test Dropdown", function(text)
+    print("Dropdown selected:", text)
 end)
-local mars = dropdown:Add("Mars")  -- Options 
-local earth = dropdown:Add("Earth")
-local not_a_planet = dropdown:Add("Iridocyclitis")
-```
-AddConsole example:
-```lua
--- Add console for ur Script/Gui, Idk if works
-features:AddConsole({ 
-	["y"] = 210,
-	["readonly"] = false,  
-	["source"] = "Lua",
-})
-```
-
-AddFolder:
-```lua
--- add folder for more space
-local folder = features:AddFolder()
-folder:AddSwitch()
-folder:AddLabel("Woo! I'm inside a folder!")
-
-local folder2 = folder:AddFolder()
-folder2:AddLabel("I'm inside *two* folders :smirk:")
+local Option1 = dropdown:Add("Option1")
+local Option2 = dropdown:Add("Option2")
+local Option3 = dropdown:Add("Option3")
 ```
