@@ -1,45 +1,40 @@
--- Load the Lume Library V2 using the loadstring
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
+local window = library:AddWindow("Script name here", {
+	main_color = Color3.fromRGB(41, 74, 122), -- When ever this is changed The color of the Ui theme also changes like the uistroke or button or toggle thing etc
+	main_size = Vector2.new(600, 340), -- Size of the gui
+	Key_system = false
+	Key = "Your key here"
+})
 
--- Create the UI with a custom title
-local ui = library:CreateUI("My Custom UI")
+local Main = window:AddTab("Tab name here") -- Name of tab
 
--- Create a "Main" tab
-local mainTab = ui:CreateTab("Main")
-
--- Add a button
-mainTab:AddButton("Teleport Player", function()
-    print("Teleporting player!")
+features:AddButton("Button name here",function()
+    -- your code here
 end)
 
--- Add a toggle
-mainTab:AddToggle("God Mode", function(state)
-    print("God Mode: " .. (state and "Enabled" or "Disabled"))
+local Toggle = features:AddToggle("Toggle name here", function()
+	-- your code here
 end)
 
--- Add a slider
-mainTab:AddSlider(1, 100, 50, function(value)
-    print("Walk Speed: " .. value)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = value
+Main:AddTextBox("Textbox name here", function(text)
+	-- your code here
 end)
 
--- Add a textbox
-mainTab:AddTextbox("Enter Message...", function(input)
-    print("Message: " .. input)
-    ui:Notify("You entered: " .. input, 3)
+local dropdown = Main:AddDropdown("Dropdown name her", function(text)
+	-- Your code here
 end)
+local Option1 = dropdown:Add("Option1")  -- Options 
+local Option2 = dropdown:Add("Option2")
+local Option3 = dropdown:Add("Option3")
 
--- Add a keybind
-mainTab:AddKeybind("Jump Key", function(key)
-    print("Jump key set or pressed: " .. key.Name)
-    if key then
-        game.Players.LocalPlayer.Character.Humanoid.Jump = true
-    end
-end)
+local Keybind = Main:AddKeybind("Keybind name here", {
 
--- Add a dropdown
-mainTab:AddDropdown({"Red", "Blue", "Green"}, function(selected)
-    print("Selected color: " .. selected)
-end)
+Main:AddLabel("Your text here")
 
-ui:Notify("Welcome to My Custom UI! Press RightShift to toggle visibility.", 5)
+local slider = Main:AddSlider("Slider name here", function()
+	-- Your code here  
+end, {                    
+
+	["min"] = 16,
+	["max"] = 100,  
+})
+slider:Set(16) -- Needed
