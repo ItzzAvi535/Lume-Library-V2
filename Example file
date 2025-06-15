@@ -1,40 +1,43 @@
-local window = library:AddWindow("Script name here", {
-	main_color = Color3.fromRGB(41, 74, 122), -- When ever this is changed The color of the Ui theme also changes like the uistroke or button or toggle thing etc
-	main_size = Vector2.new(600, 340), -- Size of the gui
-	Key_system = false
-	Key = "Your key here"
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/ItzzAvi535/Lume-Library-V2/refs/heads/main/Library", true))()
+
+local window = library:AddWindow("My Awesome Script", {
+    main_color = Color3.fromRGB(41, 74, 122),
+    main_size = Vector2.new(600, 340),
+    Key_system = true, -- Set to false to disable key system
+    Key = "Avi"
 })
 
-local Main = window:AddTab("Tab name here") -- Name of tab
+local Main = window:AddTab("Main")
 
-features:AddButton("Button name here",function()
-    -- your code here
+Main:AddButton("Test Button", function()
+    print("Button clicked!")
 end)
 
-local Toggle = features:AddToggle("Toggle name here", function()
-	-- your code here
+local Toggle = Main:AddToggle("Test Toggle", function(state)
+    print("Toggle state:", state)
 end)
 
-Main:AddTextBox("Textbox name here", function(text)
-	-- your code here
+Main:AddTextBox("Test Textbox", function(text)
+    print("Text entered:", text)
 end)
 
-local dropdown = Main:AddDropdown("Dropdown name her", function(text)
-	-- Your code here
+local dropdown = Main:AddDropdown("Test Dropdown", function(text)
+    print("Dropdown selected:", text)
 end)
-local Option1 = dropdown:Add("Option1")  -- Options 
+local Option1 = dropdown:Add("Option1")
 local Option2 = dropdown:Add("Option2")
 local Option3 = dropdown:Add("Option3")
 
-local Keybind = Main:AddKeybind("Keybind name here", {
+local Keybind = Main:AddKeybind("Test Keybind", function(key)
+    print("Keybind set to:", key.Name)
+end)
 
-Main:AddLabel("Your text here")
+Main:AddLabel("This is a test label")
 
-local slider = Main:AddSlider("Slider name here", function()
-	-- Your code here  
-end, {                    
-
-	["min"] = 16,
-	["max"] = 100,  
+local slider = Main:AddSlider("Test Slider", function(value)
+    print("Slider value:", value)
+end, {
+    min = 16,
+    max = 100
 })
-slider:Set(16) -- Needed
+slider:Set(16)
