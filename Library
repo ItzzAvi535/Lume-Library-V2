@@ -198,13 +198,18 @@ function library:AddWindow(title, config)
         scrollingFrame.Size = UDim2.new(1, 0, 1, 0)
         scrollingFrame.BackgroundTransparency = 1
         scrollingFrame.ScrollBarThickness = 6
-        scrollingFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Dynamic sizing
         scrollingFrame.Parent = page
 
         local uiListLayout = Instance.new("UIListLayout")
         uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
         uiListLayout.Padding = UDim.new(0, 10)
         uiListLayout.Parent = scrollingFrame
+
+        -- Update CanvasSize when elements are added
+        uiListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y + 20)
+        end)
 
         pages[name] = page
 
@@ -332,6 +337,7 @@ function library:AddWindow(title, config)
             dropdownFrame.Size = UDim2.new(1, -20, 0, 40)
             dropdownFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             dropdownFrame.Parent = scrollingFrame
+            dropdownFrame.ZIndex = 1 -- Base ZIndex
 
             local dropdownCorner = Instance.new("UICorner")
             dropdownCorner.CornerRadius = UDim.new(0, 5)
@@ -344,6 +350,7 @@ function library:AddWindow(title, config)
             dropdownButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             dropdownButton.Font = Enum.Font.Gotham
             dropdownButton.TextSize = 16
+            dropdownButton.ZIndex = 2
             dropdownButton.Parent = dropdownFrame
 
             local dropdownList = Instance.new("Frame")
@@ -351,6 +358,7 @@ function library:AddWindow(title, config)
             dropdownList.Position = UDim2.new(0, 0, 1, 5)
             dropdownList.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
             dropdownList.Visible = false
+            dropdownList.ZIndex = 3 -- Higher ZIndex to appear above other elements
             dropdownList.Parent = dropdownFrame
 
             local dropdownListCorner = Instance.new("UICorner")
@@ -362,9 +370,25 @@ function library:AddWindow(title, config)
             dropdownListLayout.Padding = UDim.new(0, 5)
             dropdownListLayout.Parent = dropdownList
 
+            -- Adjust subsequent elements when dropdown opens
+            local function adjustElementsBelow(isOpen)
+                local dropdownIndex = dropdownFrame.LayoutOrder
+                local offset = isOpen and (120 + 5) or 0 -- Dropdown list height + padding
+                for _, child in ipairs(scrollingFrame:GetChildren()) do
+                    if child:IsA("Frame") or child:IsA("TextButton") or child:IsA("TextBox") or child:IsA("TextLabel") then
+                        if child.LayoutOrder > dropdownIndex then
+                            createTween(child, {Position = UDim2.new(0, 0, 0, child.Position.Y.Offset + offset)}, 0.3)
+                        end
+                    end
+                end
+                -- Update CanvasSize to accommodate extra space
+                scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y + offset + 20)
+            end
+
             dropdownButton.MouseButton1Click:Connect(function()
                 dropdownList.Visible = not dropdownList.Visible
                 createTween(dropdownList, {Transparency = dropdownList.Visible and 0 or 1}, 0.3)
+                adjustElementsBelow(dropdownList.Visible)
             end)
 
             local dropdown = {}
@@ -376,12 +400,14 @@ function library:AddWindow(title, config)
                 optionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
                 optionButton.Font = Enum.Font.Gotham
                 optionButton.TextSize = 14
+                optionButton.ZIndex = 4 -- Ensure options are clickable
                 optionButton.Parent = dropdownList
 
                 optionButton.MouseButton1Click:Connect(function()
                     dropdownButton.Text = option
                     dropdownList.Visible = false
                     createTween(dropdownList, {Transparency = 1}, 0.3)
+                    adjustElementsBelow(false)
                     if callback then callback(option) end
                 end)
             end
